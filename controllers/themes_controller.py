@@ -173,7 +173,7 @@ class ThemesController():
         form = self.create_form()
         if form.validate_on_submit():
             try:
-                self.create_or_update_theme(None, form, gid=gid)
+                self.create_or_update_theme(None, form, None, gid=gid)
                 flash("Theme {0} created.".format(form.title.data), "success")
                 return redirect(url_for("themes"))
             except ValidationError:
