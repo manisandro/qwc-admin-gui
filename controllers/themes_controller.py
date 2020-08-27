@@ -118,21 +118,26 @@ class ThemesController():
         themes["items"] = []
         themes["groups"] = []
 
-        for item in self.themesconfig["themes"]["items"]:
-            themes["items"].append({
-                "name": item.get("title", item.get("url", ""))
-            })
+        if self.themesconfig.get("themes") is None:
+            return
 
-        for group in self.themesconfig["themes"]["groups"]:
-            groupEntry = {
-                "title": group.get("title", ""),
-                "items": []
-            }
-            for item in group["items"]:
-                groupEntry["items"].append({
+        if "items" in self.themesconfig["themes"].keys():
+            for item in self.themesconfig["themes"].get("items"):
+                themes["items"].append({
                     "name": item.get("title", item.get("url", ""))
                 })
-            themes["groups"].append(groupEntry)
+
+        if "groups" in self.themesconfig["themes"].keys():
+            for group in self.themesconfig["themes"]["groups"]:
+                groupEntry = {
+                    "title": group.get("title", ""),
+                    "items": []
+                }
+                for item in group["items"]:
+                    groupEntry["items"].append({
+                        "name": item.get("title", item.get("url", ""))
+                    })
+                themes["groups"].append(groupEntry)
 
         return render_template(
             "themes/index.html", themes=themes,
