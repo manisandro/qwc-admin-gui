@@ -5,3 +5,4 @@ from .resource_form import ResourceForm
 from .permission_form import PermissionForm
 from .registrable_group_form import RegistrableGroupForm
 from .registration_request_form import RegistrationRequestForm
+from .theme_form import ThemeForm

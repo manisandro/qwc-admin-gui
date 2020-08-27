@@ -1,0 +1,130 @@
+{% import "bootstrap/wtf.html" as wtf %}
+{% extends "base.html" %}
+
+{% block scripts %}
+{{super()}}
+<script type="text/javascript">
+  $(function() {
+
+    // add new row to subform
+    $("table").on("click", "button.add-row", function() {
+      var lastRow = $(this).closest("table").find("tr:last");
+      var newRow = lastRow.clone();
+      $(newRow).find(".form-control").each(function() {
+        $(this).attr("id", $(this).attr("id").replace(/\d+/, function(n){ return ++n }));
+        $(this).attr("name", $(this).attr("name").replace(/\d+/, function(n){ return ++n }));
+        $(this).attr("value", "");
+      });
+      newRow.insertAfter(lastRow);
+    });
+
+    // delete row from subform
+    $("table").on("click", "button.remove-row", function() {
+      $(this).closest('tr').remove();
+    });
+
+    // move row in subform and update indices
+    $("table").on("click", "button.move-up", function() {
+      var row = $(this).closest('tr');
+      $(row).find(".form-control").each(function() {
+        $(this).attr("id", $(this).attr("id").replace(/\d+/, function(n){ return --n }));
+        $(this).attr("name", $(this).attr("name").replace(/\d+/, function(n){ return --n }));
+      });
+      $(row.prev()).find(".form-control").each(function() {
+        $(this).attr("id", $(this).attr("id").replace(/\d+/, function(n){ return ++n }));
+        $(this).attr("name", $(this).attr("name").replace(/\d+/, function(n){ return ++n }));
+      });
+      row.insertBefore(row.prev());
+    });
+
+    // move row in subform and update indices
+    $("table").on("click", "button.move-down", function() {
+      var row = $(this).closest('tr');
+      $(row).find(".form-control").each(function() {
+        $(this).attr("id", $(this).attr("id").replace(/\d+/, function(n){ return ++n }));
+        $(this).attr("name", $(this).attr("name").replace(/\d+/, function(n){ return ++n }));
+      });
+      $(row.next()).find(".form-control").each(function() {
+        $(this).attr("id", $(this).attr("id").replace(/\d+/, function(n){ return --n }));
+        $(this).attr("name", $(this).attr("name").replace(/\d+/, function(n){ return --n }));
+      });
+      row.insertAfter(row.next());
+    });
+
+    // allow only one visible backgroundlayer
+    $(document).on("click", ".backgroundlayer-visibility", function() {
+      $(".backgroundlayer-visibility").not(this).prop("checked", false);
+    });
+
+  });
+</script>
+{% endblock %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block container %}
+  <h1>{{ title }}</h1>
+
+  <form id="form" class="form form-horizontal" action="{{ action }}" method="post" style="padding-bottom: 25px;">
+    {{ form.csrf_token }}
+    {# TODO: add missing #}
+    {{ wtf.form_field(form.url, form_type="horizontal", horizontal_columns=('sm', 2, 5)) }}
+    {{ wtf.form_field(form.title, form_type="horizontal", horizontal_columns=('sm', 2, 5)) }}
+    {{ wtf.form_field(form.thumbnail, form_type="horizontal", horizontal_columns=('sm', 2, 5)) }}
+    {{ wtf.form_field(form.attribution, form_type="horizontal", horizontal_columns=('sm', 2, 5)) }}
+    {{ wtf.form_field(form.attributionUrl, form_type="horizontal", horizontal_columns=('sm', 2, 5)) }}
+    {{ wtf.form_field(form.format, form_type="horizontal", horizontal_columns=('sm', 2, 5)) }}
+    {{ wtf.form_field(form.mapCrs, form_type="horizontal", horizontal_columns=('sm', 2, 5)) }}
+    {{ wtf.form_field(form.additionalMouseCrs, form_type="horizontal", horizontal_columns=('sm', 2, 5)) }}
+    {{ wtf.form_field(form.scales, form_type="horizontal", horizontal_columns=('sm', 2, 5)) }}
+    {{ wtf.form_field(form.printScales, form_type="horizontal", horizontal_columns=('sm', 2, 5)) }}
+    {{ wtf.form_field(form.printResolutions, form_type="horizontal", horizontal_columns=('sm', 2, 5)) }}
+    {{ wtf.form_field(form.collapseLayerGroupsBelowLevel, form_type="horizontal", horizontal_columns=('sm', 2, 5)) }}
+    {{ wtf.form_field(form.searchProviders, form_type="horizontal", horizontal_columns=('sm', 2, 5)) }}
+    {{ wtf.form_field(form.default, form_type="horizontal", horizontal_columns=('sm', 2, 5)) }}
+    {{ wtf.form_field(form.tiled, form_type="horizontal", horizontal_columns=('sm', 2, 5)) }}
+    {{ wtf.form_field(form.skipEmptyFeatureAttributes, form_type="horizontal", horizontal_columns=('sm', 2, 5)) }}
+    <legend>Backgroundlayers</legend>
+    <div data-toggle="fieldset" class="form-group">
+      <div class="col-sm-7">
+        <table class="ui table">
+          <thead>
+            <th style="text-align: center;">name</th>
+            <th style="text-align: center;">printLayer</th>
+            <th style="text-align: center;">visibility</th>
+            <th></th>
+            <th>
+              <button type="button" class="btn-sm btn-success add-row">
+                <span class="glyphicon glyphicon-plus"></span>
+              </button>
+            </th>
+          </thead>
+          <tbody>
+          {% for layer in form.backgroundLayers %}
+            <tr data-toggle="fieldset-entry">
+              <td style="width: 40%;">{{ layer.lname(class_='form-control') }}</td>
+              <td style="width: 40%;">{{ layer.printLayer(class_='form-control') }}</td>
+              <td style="width: 5%;">{{ layer.visibility(class_='form-control checkbox backgroundlayer-visibility') }}</td>
+              <td style="width: 10%;">
+                <div class="btn-group" role="group" style="display: flex;">
+                  <button type="button" class="btn-sm btn-default move-up">
+                    <span class="glyphicon glyphicon-chevron-up"></span>
+                  </button>
+                  <button type="button" class="btn-sm btn-default move-down">
+                    <span class="glyphicon glyphicon-chevron-down"></span>
+                  </button>
+                </div>
+              </td>
+              <td style="width: 5%;">
+                <button type="button" class="btn-sm btn-danger remove-row">
+                  <span class="glyphicon glyphicon-minus"></span>
+                </button>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {{ wtf.form_field(form.submit, class="btn btn-primary") }}
+  </form>
+{% endblock %}

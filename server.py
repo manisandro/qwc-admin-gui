@@ -17,10 +17,11 @@ from qwc_services_core.tenant_handler import TenantHandler, \
 from qwc_services_core.runtime_config import RuntimeConfig
 from qwc_services_core.database import DatabaseEngine
 from qwc_services_core.jwt import jwt_manager
+from qwc_services_core.config_models import ConfigModels
 from access_control import AccessControl
 from controllers import UsersController, GroupsController, RolesController, \
     ResourcesController, PermissionsController, RegistrableGroupsController, \
-    RegistrationRequestsController
+    RegistrationRequestsController, ThemesController
 
 
 # Flask application
@@ -155,6 +156,8 @@ if app.config.get('QWC_GROUP_REGISTRATION_ENABLED'):
     RegistrableGroupsController(app, handler)
     RegistrationRequestsController(app, handler, i18n, mail)
 
+config_models = ConfigModels(db_engine)
+ThemesController(app, config_models)
 access_control = AccessControl(handler, app.logger)
 
 
