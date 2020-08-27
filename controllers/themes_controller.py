@@ -324,7 +324,11 @@ class ThemesController():
 
     def add_theme_group(self):
         """Add new theme group."""
-        self.themesconfig["themes"]["groups"].append({
+
+        if "groups" not in self.themesconfig["themes"].keys():
+            self.themesconfig["themes"]["groups"] = []
+
+        self.themesconfig["themes"].get("groups").append({
             "title": "new group",
             "items": []
         })
